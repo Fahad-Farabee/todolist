@@ -4,25 +4,85 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
 {
+    //adding task
     function add_task(Request $request)
     {
-        $task = new Task();
-        $task->task_details = $request->task_details;
-        $task->dueDateTime = $request->dueDateTime;
-
-        if ($task->save()) {
-            return ["result" => "Task Added Successfully"];
+        $rules = array(
+            'task_details' => 'required',
+            'date' => 'required',
+            'time' => 'required',
+        );
+        $validation = Validator::make($request->all(), $rules);
+        if ($validation->fails()) {
+            return $validation->errors();
         } else {
-            return ["result" => "operation Failed"];
+            $task = new Task();
+            $task->task_details = $request->task_details;
+            $task->task_status = $request->task_status;
+            $date = $request->date;
+            $time = $request->time;
+            $combinedDateTime = date("Y-m-d H:i:s", strtotime("$date $time"));
+            $task->due_date_time = $combinedDateTime;
+            if ($task->save()) {
+                return ['result' => "Task Added Successfully"];
+            } else {
+                return ['result' => "Operation failed!!"];
+            }
         }
     }
 
-    function show_task() {}
+    //showing tasks
+    function show_tasks()
+    {
+        return Task::all();
+    }
 
-    function delete_task($id) {}
+    //updating the task's status.
+    function update_task($id)
+    {
+        $task = Task::findOrFail($id);
+        if ($task->task_status == true) {
+            return response()->json([
+                'success' => false,
+                'msg' => "Task already completed!",
+                'status' => $task->task_status,
+            ], 200);
+        } else {
+            $task->task_status = !$task->task_status;
+            if ($task->save()) {
+                return response()->json([
+                    'success' => false,
+                    'msg' => "Task status updated successfully!",
+                    'status' => $task->task_status,
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'msg' => "Failed to update!",
+                    'status' => $task->task_status,
+                ], 500);
+            }
+        }
+    }
 
-    function update_task_status($id) {}
+    //delete Task
+    function delete_task($id)
+    {
+        $deleted_task = Task::destroy($id);
+        if ($deleted_task) {
+            return response()->json([
+                'success' => true,
+                'msg' => "Task deleted successfully!",
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'msg' => "Task not found or could not be deleted!"
+            ], 404);
+        }
+    }
 }

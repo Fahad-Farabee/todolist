@@ -3,10 +3,9 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Task;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Task>
  */
 class TaskFactory extends Factory
 {
@@ -19,9 +18,8 @@ class TaskFactory extends Factory
     {
         return [
             'task_details' => fake()->text(),
-            'task_status' => fake()->randomElement([true, false]),
-            'dueDateTime' => fake()->dateTime(),
-            'created_at' => fake()->dateTime(),
+            'due_date_time' => fake()->dateTime(),
+            'task_status' => fake()->boolean()
         ];
     }
 }

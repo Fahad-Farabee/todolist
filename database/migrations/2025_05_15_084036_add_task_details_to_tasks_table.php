@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->dateTime('updated_at');
+            $table->text('task_details')->after('id');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('the_task', function (Blueprint $table) {
-            //
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->dropColumn('task_details');
         });
     }
 };
