@@ -18,19 +18,29 @@ class TaskController extends Controller
         );
         $validation = Validator::make($request->all(), $rules);
         if ($validation->fails()) {
-            return $validation->errors();
+            return response()->json([
+                'success' => false,
+                'msg' => $validation->errors()->first()
+            ], 400);
         } else {
             $task = new Task();
             $task->task_details = $request->task_details;
-            $task->task_status = $request->task_status;
+            /* $task->task_status = $request->task_status; */
             $date = $request->date;
             $time = $request->time;
             $combinedDateTime = date("Y-m-d H:i:s", strtotime("$date $time"));
             $task->due_date_time = $combinedDateTime;
             if ($task->save()) {
-                return ['result' => "Task Added Successfully"];
+                /* return ['result' => "Task Added Successfully"]; */
+                return response()->json([
+                    'success' => true,
+                    'msg' => "Task added successfully!",
+                ], 200);
             } else {
-                return ['result' => "Operation failed!!"];
+                return response()->json([
+                    'success' => false,
+                    'msg' => "Operation Failed!!",
+                ], 400);
             }
         }
     }
@@ -38,7 +48,8 @@ class TaskController extends Controller
     //showing tasks
     function show_tasks()
     {
-        return Task::all();
+        $tasks = Task::all();
+        return response()->json($tasks);
     }
 
     //updating the task's status.
